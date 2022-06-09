@@ -2,6 +2,7 @@ pub mod diamond_square;
 pub mod diamond_square_borderless;
 
 use crate::config;
+use crate::map_data::MapData;
 use image::RgbImage;
 use std::path::Path;
 
@@ -20,11 +21,15 @@ pub trait Save {
     }
 }
 
-pub trait ToImage {
-    fn to_image(&self, algo: &str) -> RgbImage; 
+//pub trait ToImage {
+//    fn to_image(&self, coloring: &str) -> RgbImage; 
+//}
+
+pub trait GetData {
+    fn get_data(&self) -> &MapData;
 }
 
-pub trait ImageAlg: Run + Save + ToImage {
+pub trait ImageAlg: Run + Save + GetData {
     fn imagealg(&self) -> &str {
         return "Hello"
     }

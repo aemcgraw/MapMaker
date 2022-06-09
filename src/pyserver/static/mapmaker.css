@@ -1,0 +1,161 @@
+#title {
+    background-color: #f4f4f4;
+    border: 1px solid black;
+    color: Black;
+    font-family: avenir next avenir sans-serif;
+    font-size: 20px;
+    margin: 0px 0px 30px 0px;
+    text-align: center;
+}
+
+#container {
+    display: grid;
+    /* margin: 0px auto 10px auto; */
+    margin: 5px 10px 10px 10px;
+    min-height: 70vh;
+}
+
+#mainpage {
+    border: 1px solid black;
+    /* margin: 10px 10px 0px 10px; */
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    padding: 15px;
+    height: 100vh;
+}
+
+#sidebar {
+    border: 1px solid black;
+    color: Black;
+    font-size: 90%;
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    padding: 5px;
+    overflow: scroll;
+    vertical-align: top;
+}
+
+#options-collapse {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+header {
+    border: 1px solid black;
+    color: Black;
+    padding: 15px;
+    margin: 10px 10px 0px 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+nav {
+    background-color: #d6cfbf;
+    border-top: 0px;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    color: Black;
+    margin: 0px 10px 0px 10px;
+    font-size: 1rem;
+    top: 0;
+    position: sticky;
+    position: -webkit-sticky;
+    z-index: 2;
+}
+
+nav div ul {
+    margin: 0px;
+    list-style-type: none;
+}
+
+nav div ul li {
+    display: inline;
+    padding: 7px;
+    font-weight: 500;
+}
+
+nav div ul li.selected {
+    background-color: #d6cfbf;
+    border-top: 1.5px solid black;
+    border-right: 1.5px solid black;
+    border-left: 1.5px solid black;
+}
+
+/* =====================================================================
+ * Collapsible Element
+ * ---------------------------------------------------------------------
+ */
+.collapsible {
+    background-color: #f4f4f4;
+    color: Black;
+    cursor: pointer;
+    padding: 5px;
+    width: 100%;
+    border: 1px;
+    text-align: left;
+    outline: 1px;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.collapsed {
+    display: none;
+}
+
+.active, .collapsible:hover {
+    background-color: #f4f4f4;
+}
+
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #fff6e1;
+    margin: 5px;
+}
+
+/* =====================================================================
+ * Class Styles
+ * ---------------------------------------------------------------------
+ */
+
+.dataview {
+    grid-template-columns: 80% 2% 18%;
+}
+
+.fullview {
+    grid-template-columns: 98% 2% 0%;
+}
+
+.justify-left {
+    justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+}
+
+.justify-right {
+    justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+}
+
+.flex {
+    display: flex;
+}
+
+.pl-10 {
+    padding-left: 10px;
+}
+
+ul {
+    margin: 0px;
+    padding: 7px;
+    list-style-type: none;
+}
+
+ul li {
+    display: inline-block;
+    padding: 2px 7px 0px 0px;
+    font-weight: 500;
+    white-space: nowrap;
+}

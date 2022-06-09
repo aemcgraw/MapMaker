@@ -1,5 +1,5 @@
 use crate::map_data::MapData;
-use crate::algorithms::{Run, Size, Save, ToImage, ImageAlg};
+use crate::algorithms::{GetData, Run, Size, Save, ImageAlg};
 
 use image::RgbImage;
 use rand::Rng;
@@ -7,7 +7,7 @@ use rand::Rng;
 pub struct DiamondSquare {
     image : RgbImage,
     data : MapData,
-    dim : u32,
+    pub dim : u32,
 }
 
 impl DiamondSquare {
@@ -119,12 +119,29 @@ impl DiamondSquare {
     //        }
     //    }
     //}
-}
 
+/*
+    pub fn to_imagedata(&self, coloring: &str) -> Vec<u8> {
+        let image = self.data.to_imagedata(coloring);
+        return image;
+    }
+
+}
+*/
+
+/*
 impl ToImage for DiamondSquare {
     fn to_image(&self, algo: &str) -> RgbImage {
         let image = self.data.to_image(algo);
         return image;
+    }
+*/
+}
+
+
+impl GetData for DiamondSquare {
+    fn get_data(&self) -> &MapData {
+        return &self.data;
     }
 }
 

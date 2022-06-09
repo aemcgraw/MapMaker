@@ -2,10 +2,13 @@ pub mod algorithms;
 pub mod map_data;
 pub mod config;
 pub mod util;
+pub mod coloring;
 
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
 use algorithms::diamond_square_borderless::DiamondSquareBorderless;
+
+use coloring::coloring::Coloring;
 
 use clap::Parser;
 use image::imageops;
@@ -22,7 +25,7 @@ struct Cli {
     algorithm: String,
 
     #[clap(short, long, 
-        default_value = "rainbow",
+        default_value = "bluegreen",
         help = "Process for coloring the resulting terrain:\n Options: \n\trainbow,\n\tbluegreen\n"
     )]
     coloring: String,
@@ -72,8 +75,12 @@ fn main() {
     let mut dx = initialize_algorithm(width, height, &algo);
 
     dx.run(chaos);
+    let mapdata = dx.get_data();
 
-    let image = dx.to_image(&coloring);
+    let coloring = Coloring::new(mapdata);
+
+    let image = coloring.data_to_blue_green(0.9);
+
     let reimage = imageops::resize(&image, width, height, imageops::FilterType::Nearest);
     dx.save(reimage, &output);
 

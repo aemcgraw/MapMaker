@@ -1,5 +1,5 @@
 use crate::map_data::MapData;
-use crate::algorithms::{Run, Size, Save, ToImage, ImageAlg};
+use crate::algorithms::{GetData, Run, Size, Save, ImageAlg};
 
 use image::RgbImage;
 use rand::Rng;
@@ -82,6 +82,12 @@ impl DiamondSquareBorderless {
     //}
 }
 
+impl GetData for DiamondSquareBorderless {
+    fn get_data(&self) -> &MapData {
+        return &self.data;
+    }
+}
+
 impl Run for DiamondSquareBorderless {
     fn run(&mut self, chaos: f64) {
         let mut rng = rand::thread_rng();
@@ -112,12 +118,14 @@ impl Run for DiamondSquareBorderless {
     }
 }
 
+/*
 impl ToImage for DiamondSquareBorderless {
-    fn to_image(&self, algo: &str) -> RgbImage {
-        let image = self.data.to_image(algo);
+    fn to_image(&self, coloring: &str) -> RgbImage {
+        let image = self.data.to_image(coloring);
         return image;
     }
 }
+*/
 
 impl Save for DiamondSquareBorderless {}
 
