@@ -71,15 +71,9 @@ impl Coloring<'_> {
             }
 
             if x < &water {
-                data.push(0);
-                data.push(0);
-                data.push(rgbvalue);
-                data.push(255);
+                data.append(&mut vec![0, 0, rgbvalue, 255]);
             } else {
-                data.push(0);
-                data.push(rgbvalue);
-                data.push(0);
-                data.push(255);
+                data.append(&mut vec![0, rgbvalue, 0, 255]);
             }
 
             if counterx < map_vec.width - 1 {
@@ -130,9 +124,7 @@ impl Coloring<'_> {
         for x in &map_vec.data {
             let greenv: u8 = normalize(x, 0.0);
             let bluev: u8 = normalize(x, 0.33);
-            //let mut bluev: u8 = 0;
             let redv: u8 = normalize_edge(x);
-            //let mut redv: u8 = 0;
 
             output.put_pixel(counterx, countery, Rgb([redv, greenv, bluev]));
 
@@ -146,4 +138,59 @@ impl Coloring<'_> {
 
         return output;
     }
+
+    pub fn data_to_rainbow_vec(&self) -> Vec<u8> {
+        let map_vec = &self.data;
+
+        fn normalize(value: &f64, low: f64) -> u8 {
+            if value < &low {
+                return 0;
+            } else if value < &(low + 0.16) {
+                return ((value - low) * 6.0 * 255.0) as u8;
+            } else if value < &(low + 0.5) {
+                return 255;
+            } else if value < &(low + 0.66) {
+                return ((1.0 - ((value - 0.5) * 6.0)) * 255.0) as u8;
+            } else {
+                return 0;
+            }
+        }
+
+        fn normalize_edge(value: &f64) -> u8 {
+            if (value < &0.16) | (value > &0.84) {
+                return 255;
+            } else if value < &0.33 {
+                return ((1.0 - ((value - 0.16) * 6.0)) * 255.0) as u8;
+            } else if value > &0.66 {
+                return ((value - 0.66) * 6.0 * 255.0) as u8
+            } else {
+                return 0;
+            }
+        }
+
+        let mut data = Vec::new();
+        let mut tempdata = map_vec.data.clone();
+
+        let mut counterx = 0;
+        let mut countery = 0;
+
+        for x in &map_vec.data {
+            let greenv: u8 = normalize(x, 0.0);
+            let bluev: u8 = normalize(x, 0.33);
+            let redv: u8 = normalize_edge(x);
+
+            data.append(&mut vec![redv, greenv, bluev, 255]);
+
+            if counterx < map_vec.width - 1 {
+                counterx = counterx + 1;
+            } else {
+                countery = countery + 1;
+                counterx = 0;
+            }
+        }
+
+        return data;
+    }
+
+
 }

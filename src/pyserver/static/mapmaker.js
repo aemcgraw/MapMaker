@@ -1,24 +1,39 @@
 "use strict;"
 
-import init, { makeimage } from "./pkg/making_maps.js";
+import init, { makeimage_rainbow, makeimage_bluegreen } from "./pkg/making_maps.js";
+import { CanvasUtil } from './canvasutil.js';
+import { FileUtil } from './fileutil.js';
 
 function createmap() {
     const canvas = document.getElementById('map-canvas');
     const ctx = canvas.getContext('2d');
 
+    var algorithm = document.getElementById('algorithm').value;
     var width = parseInt(document.getElementById('widthbox').value);
     var height = parseInt(document.getElementById('heightbox').value);
     var chaos = parseFloat(document.getElementById('chaosbox').value);
-    var algorithm = document.getElementById('algorithm').value;
+    var coloring = document.getElementById('coloring').value;
     var water = parseFloat(document.getElementById('waterbox').value);
-    //var coloring = document.getElementById('coloring').value;
-
-    //var waterperc = parseFloat("0.5")
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
-        canvas.width = width;
-        canvas.height = height;
-        makeimage(ctx, width, height, water);
+        canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
+        canvas.height = height < 1000 ? height: 1000;
+        switch(algorithm) {
+            case "DiamondSquare":
+                switch(coloring) {
+                    case "BlueGreen":
+                        makeimage_bluegreen(ctx, width, height, chaos, water);
+                        break;
+                    case "Rainbow":
+                        makeimage_rainbow(ctx, width, height, chaos);
+                        break;
+                }
+                break;
+            case "DiamondSquareBorderless":
+                break;
+        }
+        //makeimage(ctx, width, height, coloring, chaos);
+        //makeimage_bluegreen(ctx, width, height, chaos, water);
     } else if (width == NaN || width == 0) {
         alert('Could not interpret value given for width');
     } else {
@@ -33,6 +48,30 @@ function collapse() {
     document.getElementById('container').classList.toggle('fullview');
 }
 
+function dothing(ev) {
+    var caller = ev.currentTarget;
+
+    var dClassList = document.getElementsByClassName('Color');
+    for (let i = 0; i < dClassList.length; i++) {
+        dClassList[i].classList.add('hidden');
+    }
+
+    switch(caller.options[caller.selectedIndex].text) {
+        case "BlueGreen":
+                var dClassList = document.getElementsByClassName('BlueGreen');
+                for (let i = 0; i < dClassList.length; i++) {
+                    dClassList[i].classList.remove('hidden');
+                }
+            break;
+        case "Rainbow":
+                var dClassList = document.getElementsByClassName('Rainbow');
+                for (let i = 0; i < dClassList.length; i++) {
+                    dClassList[i].classList.remove('hidden');
+                }
+            break;
+    }
+}
+
 async function run() {
     await init();
     //createmap();
@@ -42,6 +81,29 @@ async function run() {
 
     var bmake = document.getElementById('makebutton');
     bmake.addEventListener('click', function() {createmap()})
+
+    var colorselector = document.getElementById('coloring');
+    colorselector.addEventListener('change', dothing)
+
+    var reset = document.getElementById('reset');
+    reset.addEventListener('click', function() {CanvasUtil.reset()});
+
+    var zoomin = document.getElementById('zoomin');
+    zoomin.addEventListener('click', function() {CanvasUtil.zoom_in_graph()});
+
+    var zoomout = document.getElementById('zoomout');
+    zoomout.addEventListener('click', function() {CanvasUtil.zoom_out_graph()});
+
+    mainpage.addEventListener('mousedown', function() {CanvasUtil.drag_element(event)});
+
+    var loadbutton = document.getElementById('load');
+    loadbutton.addEventListener('click', function() {FileUtil.loadfile()});
+
+    var savebutton = document.getElementById('save');
+    savebutton.addEventListener('click', function() {FileUtil.save_to_server()});
+
+    var downloadbutton = document.getElementById('download');
+    downloadbutton.addEventListener('click', function() {FileUtil.download()});
 }
 
 window.onload = run()

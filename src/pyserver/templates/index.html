@@ -5,7 +5,7 @@
 <meta charset="utf-8">
     <title>Maps!</title>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="{{url_for('static', filename='mapmaker.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/mapmaker.css')}}">
     <script src='../static/bootstrap.js'>
     <script src="{{url_for('static', filename='mapmaker.js')}}", type="module"></script>
 </head>
@@ -14,7 +14,7 @@
     <nav>
         <div class='flex justify-right'>
             <ul class='flex pl-10'>
-                <li>Search</li>
+                <li id='download' class='link' title='Download the current image'>Download</li>
             </ul>
         </div>
     </nav>
@@ -26,7 +26,7 @@
             <h4>Options</h4>
             <ul id="options">
                 <li>
-                    <select name="algorithm" id="algorithm">
+                    <select name="algorithm" id="algorithm" autocomplete="off">
                     <option value="DiamondSquare">DiamondSquare</option>
                     <option value="DiamondSquareBorderless">DiamondSquareBorderless</option>
                     </select>
@@ -44,24 +44,52 @@
                     <input id="chaosbox" type="text" name="chaosbox" placeholder="spikiness, usually 0 - 1">
                 </li>
                 <li></li>
+
                 <li>
-                    <select name="coloring" id="algorithm">
+                    <select name="coloring" id="coloring" autocomplete="off">
                     <option value="BlueGreen">BlueGreen</option>
                     <option value="Rainbow">Rainbow</option>
                     </select>
+                </li>
+
+                <span class="BlueGreen Color">
                 <li>
                     Water:
                     <input id="waterbox" type="text" name="waterbox" placeholder="%water on map">
                 </li>
+                </span>
+
                 <li id='generate'>
                     <button id="makebutton">Make</button>
+                </li>
+
+                <li></li>
+                <li>
+                    <label for="savefilename">File:</label>
+                    <input id="savefilename" type="text" placeholder="myfile.txt"></input>
+                </li>
+                <li>
+                    <button id="save">Save</button>
+                </li>
+                <li>
+                    <label for="loadfilename">File:</label>
+                    <input id="loadfilename" type="text" placeholder="myfile.txt"></input>
+                </li>
+                <li>
+                    <button id="load">Load</button>
                 </li>
             </ul>
         </div>
         <button id="options-collapse"></button>
         <div id="mainpage">
-            <div id="map" width="95%" height="80%">
-                <canvas id="map-canvas" width="95%" height="80%"></canvas>
+            <button id="zoomin">+</button>
+            <button id="zoomout">-</button>
+            <button id="reset">o</button>
+            <div id="map">
+                <canvas id="map-canvas"></canvas>
+            </div>
+            <!-- <div id="map" width="95%" height="80%">
+                <canvas id="map-canvas" width="95%" height="80%"></canvas> -->
             </div>
         </div>
     </div>
