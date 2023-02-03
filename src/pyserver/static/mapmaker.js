@@ -1,6 +1,6 @@
 "use strict;"
 
-import init, { makeimage_rainbow, makeimage_bluegreen } from "./pkg/making_maps.js";
+import init, { makeimage_rainbow, makeimage_bluegreen, MapArgs} from "./pkg/making_maps.js";
 import { CanvasUtil } from './canvasutil.js';
 import { FileUtil } from './fileutil.js';
 
@@ -12,8 +12,14 @@ function createmap() {
     var width = parseInt(document.getElementById('widthbox').value);
     var height = parseInt(document.getElementById('heightbox').value);
     var chaos = parseFloat(document.getElementById('chaosbox').value);
+    if (isNaN(chaos)) {chaos = 0.5;}
+    var damping = parseFloat(document.getElementById('dampingbox').value);
+    if (isNaN(damping)) {damping = 0.8;}
+    var blocksize = parseInt(document.getElementById('blockbox').value);
     var coloring = document.getElementById('coloring').value;
-    var water = parseFloat(document.getElementById('waterbox').value);
+    var water = parseFloat(document.getElementById('waterRange').value);
+
+    const mapargs = new MapArgs(width, height, chaos, damping, blocksize);
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
@@ -22,10 +28,10 @@ function createmap() {
             case "DiamondSquare":
                 switch(coloring) {
                     case "BlueGreen":
-                        makeimage_bluegreen(ctx, width, height, chaos, water);
+                        makeimage_bluegreen(ctx, mapargs, water);
                         break;
                     case "Rainbow":
-                        makeimage_rainbow(ctx, width, height, chaos);
+                        makeimage_rainbow(ctx, mapargs);
                         break;
                 }
                 break;

@@ -3,6 +3,7 @@ use crate::algorithms::{GetData, Run, Size, Save, ImageAlg};
 
 use image::RgbImage;
 use rand::Rng;
+use rand::distributions::{Distribution, Uniform};
 
 pub struct DiamondSquare {
     image : RgbImage,
@@ -23,13 +24,15 @@ impl DiamondSquare {
         let newsize = stepsize / 2;
         let mut rng = rand::thread_rng(); 
 
+        let sampler = Uniform::new_inclusive(-chaos, chaos);
+
         for x in (0..self.dim - 1).step_by(stepsize as usize) {
             for y in (0..self.dim - 1).step_by(stepsize as usize) {
                 let z : f64 = (self.data.get_pixel(x, y) + 
                               self.data.get_pixel(x + stepsize, y) + 
                               self.data.get_pixel(x, y + stepsize) + 
                               self.data.get_pixel(x + stepsize, y + stepsize)) / 4.0;
-                self.data.put_pixel(x + newsize, y + newsize, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel(x + newsize, y + newsize, z + sampler.sample(&mut rng));
             }
         }
     }
@@ -38,33 +41,35 @@ impl DiamondSquare {
         let mut z: f64;
         let mut rng = rand::thread_rng();
 
+        let sampler = Uniform::new_inclusive(-chaos, chaos);
+
         let half = stepsize / 2;
         for x in (half..self.dim - 1).step_by(stepsize as usize) {
             z = (self.data.get_pixel(x - half, 0) +
                          self.data.get_pixel(x + half, 0) +
                          self.data.get_pixel(x, half)) / 3.0;
-            self.data.put_pixel(x, 0, z + rng.gen_range(-chaos..chaos));
+            self.data.put_pixel(x, 0, z + sampler.sample(&mut rng));
         }
 
         for x in (half..self.dim - 1).step_by(stepsize as usize) {
             z = (self.data.get_pixel(x - half, self.dim - 1) +
                          self.data.get_pixel(x + half, self.dim - 1) +
                          self.data.get_pixel(x, self.dim - 1 - half)) / 3.0;
-            self.data.put_pixel(x, self.dim - 1, z + rng.gen_range(-chaos..chaos));
+            self.data.put_pixel(x, self.dim - 1, z + sampler.sample(&mut rng));
         }
 
         for y in (half..self.dim - 1).step_by(stepsize as usize) {
             z = (self.data.get_pixel(0, y - half) +
                          self.data.get_pixel(0, y + half) +
                          self.data.get_pixel(half, y)) / 3.0;
-            self.data.put_pixel(0, y, z + rng.gen_range(-chaos..chaos));
+            self.data.put_pixel(0, y, z + sampler.sample(&mut rng));
         }
 
         for y in (half..self.dim - 1).step_by(stepsize as usize) {
             z = (self.data.get_pixel(self.dim - 1, y - half) +
                          self.data.get_pixel(self.dim - 1, y + half) +
                          self.data.get_pixel(self.dim - 1 - half, y)) / 3.0;
-            self.data.put_pixel(self.dim - 1, y, z + rng.gen_range(-chaos..chaos));
+            self.data.put_pixel(self.dim - 1, y, z + sampler.sample(&mut rng));
         }
 
         for x in (half..self.dim - 1 - half).step_by(stepsize as usize) {
@@ -76,25 +81,25 @@ impl DiamondSquare {
                     self.data.get_pixel(midx, y - half) +
                     self.data.get_pixel(x, y) +
                     self.data.get_pixel(x + stepsize, y)) / 4.0;
-                self.data.put_pixel(x + half, y, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel(x + half, y, z + sampler.sample(&mut rng));
 
                 z = (self.data.get_pixel(midx, midy) +
                     self.data.get_pixel(x, y) +
                     self.data.get_pixel(x, y + stepsize) +
                     self.data.get_pixel(x - half, midy)) / 4.0;
-                self.data.put_pixel(x, y + half, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel(x, y + half, z + sampler.sample(&mut rng));
 
                 z = (self.data.get_pixel(midx, midy) +
                     self.data.get_pixel(x + stepsize, y) +
                     self.data.get_pixel(x + stepsize, y + stepsize) +
                     self.data.get_pixel(midx + stepsize, midy)) / 4.0;
-                self.data.put_pixel(x + stepsize, y + half, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel(x + stepsize, y + half, z + sampler.sample(&mut rng));
                 
                 z = (self.data.get_pixel(midx, midy) +
                     self.data.get_pixel(x, y + stepsize) +
                     self.data.get_pixel(x + stepsize, y + stepsize) +
                     self.data.get_pixel(midx, midy + stepsize)) / 4.0;
-                self.data.put_pixel(x + half, y + stepsize, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel(x + half, y + stepsize, z + sampler.sample(&mut rng));
             }
         }
     }
@@ -146,19 +151,26 @@ impl GetData for DiamondSquare {
 }
 
 impl Run for DiamondSquare {
-    fn run(&mut self, chaos: f64) {
+    fn run(&mut self, chaos: f64, damping: f64, blocksize: u32) {
         let mut rng = rand::thread_rng();
 
-        let init = self.dim - 1;
-        self.data.put_pixel(0, 0, rng.gen_range(0.0..1.0));
-        self.data.put_pixel(0, init, rng.gen_range(0.0..1.0));
-        self.data.put_pixel(init, 0, rng.gen_range(0.0..1.0));
-        self.data.put_pixel(init, init, rng.gen_range(0.0..1.0));
+        let mut blocksize = blocksize;
+        if (blocksize % 2) != 0 {
+            let mut x: u32 = 1;
+            while x < blocksize {
+                x = x * 2
+            }
+            blocksize = x;
+        }
+
+        for x in (0..self.dim-1).step_by(blocksize as usize) {
+            for y in (0..self.dim-1).step_by(blocksize as usize) {
+                self.data.put_pixel(x, y, rng.gen_range(0.0..1.0));
+            }
+        }
 
         let mut chaos: f64 = chaos;
-        let damping: f64 = 0.8;
-
-        let mut stepsize = self.dim - 1;
+        let mut stepsize = blocksize;
         while (stepsize) >= 2 {
 
             self.diamond(stepsize, chaos);

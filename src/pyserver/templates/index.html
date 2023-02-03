@@ -33,15 +33,23 @@
                 </li>
                 <li id='width'>
                     Width:
-                    <input id="widthbox" type="text" name="widthbox" placeholder="width in pixels">
+                    <input id="widthbox" class="width70" type="text" name="widthbox" placeholder="width in pixels">
                 </li>
                 <li id='height'>
                     Height:
-                    <input id="heightbox" type="text" name="heightbox" placeholder="height in pixels">
+                    <input id="heightbox" class="width70" type="text" name="heightbox" placeholder="height in pixels">
                 </li>
                 <li id='chaos'>
                     Chaos:
-                    <input id="chaosbox" type="text" name="chaosbox" placeholder="spikiness, usually 0 - 1">
+                    <input id="chaosbox" class="width70" type="text" name="chaosbox" placeholder="spikiness, usually 0 - 1">
+                </li>
+                <li id='damping'>
+                    Damping:
+                    <input id="dampingbox" class="width70" type="text" name="dampingbox" placeholder="amount to scale chaos per round">
+                </li>
+                <li id='blocksize'>
+                    Blocksize:
+                    <input id="blockbox" class="width70" type="text" name="blockbox">
                 </li>
                 <li></li>
 
@@ -54,8 +62,11 @@
 
                 <span class="BlueGreen Color">
                 <li>
-                    Water:
-                    <input id="waterbox" type="text" name="waterbox" placeholder="%water on map">
+                    Water: 
+                    <span id="waterRangeValue" class="float-right">0.5</span>
+                    <input type="range" oninput="waterRangeValue.innerText=this.value" min="0" max="1" value="0.5" step="0.01" class="slider" id="waterRange">
+                    <!-- Water:
+                    <input id="waterbox" type="text" name="waterbox" placeholder="%water on map"> -->
                 </li>
                 </span>
 
@@ -82,9 +93,9 @@
         </div>
         <button id="options-collapse"></button>
         <div id="mainpage">
-            <button id="zoomin">+</button>
-            <button id="zoomout">-</button>
-            <button id="reset">o</button>
+            <button id="zoomin" title="Zoomin">+</button>
+            <button id="zoomout" title="Zoomout">-</button>
+            <button id="reset" title="Reset image location">o</button>
             <div id="map">
                 <canvas id="map-canvas"></canvas>
             </div>

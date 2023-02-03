@@ -74,7 +74,7 @@ fn main() {
 
     let mut dx = initialize_algorithm(width, height, &algo);
 
-    dx.run(chaos);
+    dx.run(chaos, 0.8);
     let mapdata = dx.get_data();
 
     let coloring = Coloring::new(mapdata);

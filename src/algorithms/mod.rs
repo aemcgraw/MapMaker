@@ -7,7 +7,7 @@ use image::RgbImage;
 use std::path::Path;
 
 pub trait Run {
-    fn run(&mut self, chaos: f64);
+    fn run(&mut self, chaos: f64, damping: f64, blocksize: u32);
 }
 
 pub trait Size {
