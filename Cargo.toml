@@ -25,3 +25,6 @@ features = ["console", "CanvasRenderingContext2d", "ImageData"]
 
 [dev-dependencies]
 js-sys = "0.3.22"
+
+[profile.release]
+debug = true

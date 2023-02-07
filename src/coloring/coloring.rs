@@ -169,7 +169,6 @@ impl Coloring<'_> {
         }
 
         let mut data = Vec::new();
-        let mut tempdata = map_vec.data.clone();
 
         let mut counterx = 0;
         let mut countery = 0;
@@ -192,5 +191,41 @@ impl Coloring<'_> {
         return data;
     }
 
+    pub fn data_to_topographical_vec(&self, water: Option<f64>) -> Vec<u8> {
+        let map_vec = &self.data;
 
+        let mut counterx = 0;
+        let mut countery = 0;
+
+        let waterperc = match water {
+            Some(w) => w,
+            None => 0.0
+        };
+
+        let mut data = Vec::new();
+        let mut tempdata = map_vec.data.clone();
+        let initvalue = (tempdata.len() as f64) * waterperc;
+        let waterheight = util::quickselect(&mut tempdata, initvalue as u32);
+
+        for x in &map_vec.data {
+            let fract = (x * 10.0).fract();
+
+            if x < &waterheight {
+                data.append(&mut vec![0, 0, 255, 255]);
+            } else if (fract < 0.1) | (fract > 0.9) {
+                data.append(&mut vec![0, 0, 0, 255]);
+            } else {
+                data.append(&mut vec![255, 255, 255, 255]);
+            }
+
+            if counterx < map_vec.width - 1 {
+                counterx = counterx + 1
+            } else {
+                countery = countery + 1;
+                counterx = 0;
+            }
+        }
+
+        return data;
+    }
 }

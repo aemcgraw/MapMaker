@@ -1,8 +1,9 @@
 use crate::map_data::MapData;
-use crate::algorithms::{GetData, Run, Size, Save, ImageAlg};
+use crate::algorithms::{GetData, GetDim, Run, Size, Save, ImageAlg};
 
-use image::RgbImage;
 use rand::Rng;
+use rand::distributions::{Distribution, Uniform};
+use image::RgbImage;
 
 pub struct DiamondSquareBorderless {
     image : RgbImage,
@@ -16,7 +17,6 @@ impl DiamondSquareBorderless {
 
         let vec_size = bsize * bsize;
         let backing_data : Vec<f64> = vec!(0.0; vec_size as usize);
-
         return DiamondSquareBorderless { image : RgbImage::new(bsize, bsize), data : MapData::new(backing_data, bsize, bsize), dim : bsize }
     }
 
@@ -24,6 +24,7 @@ impl DiamondSquareBorderless {
         let half = stepsize / 2;
         let mut rng = rand::thread_rng(); 
 
+        let sampler = Uniform::new_inclusive(-chaos, chaos);
         let start = self.dim / 6;
 
         for x in (start..self.dim + start).step_by(stepsize as usize) {
@@ -32,7 +33,7 @@ impl DiamondSquareBorderless {
                               self.data.get_pixel_modular(x + stepsize, y) + 
                               self.data.get_pixel_modular(x, y + stepsize) + 
                               self.data.get_pixel_modular(x + stepsize, y + stepsize)) / 4.0;
-                self.data.put_pixel_modular(x + half, y + half, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel_modular(x + half, y + half, z + sampler.sample(&mut rng));
             }
         }
     }
@@ -40,6 +41,7 @@ impl DiamondSquareBorderless {
     fn square(&mut self, stepsize : u32, chaos: f64) {
         let mut z: f64;
         let mut rng = rand::thread_rng();
+        let sampler = Uniform::new_inclusive(-chaos, chaos);
 
         let half = stepsize / 2;
         let start = self.dim / 6;
@@ -53,25 +55,25 @@ impl DiamondSquareBorderless {
                     self.data.get_pixel_modular(midx, y - half) +
                     self.data.get_pixel_modular(x, y) +
                     self.data.get_pixel_modular(x, y + stepsize)) / 4.0;
-                self.data.put_pixel_modular(x + half, y, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel_modular(x + half, y, z + sampler.sample(&mut rng));
 
                 z = (self.data.get_pixel_modular(midx, midy) +
                     self.data.get_pixel_modular(x, y) +
                     self.data.get_pixel_modular(x, y + stepsize) +
                     self.data.get_pixel_modular(x - half, midy)) / 4.0;
-                self.data.put_pixel_modular(x, y + half, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel_modular(x, y + half, z + sampler.sample(&mut rng));
 
                 z = (self.data.get_pixel_modular(midx, midy) +
                     self.data.get_pixel_modular(x + stepsize, y) +
                     self.data.get_pixel_modular(x + stepsize, y + stepsize) +
                     self.data.get_pixel_modular(midx + stepsize, midy)) / 4.0;
-                self.data.put_pixel_modular(x + stepsize, y + half, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel_modular(x + stepsize, y + half, z + sampler.sample(&mut rng));
                 
                 z = (self.data.get_pixel_modular(midx, midy) +
                     self.data.get_pixel_modular(x, y + stepsize) +
                     self.data.get_pixel_modular(x + stepsize, y + stepsize) +
                     self.data.get_pixel_modular(midx, midy + stepsize)) / 4.0;
-                self.data.put_pixel_modular(x + half, y + stepsize, z + rng.gen_range(-chaos..chaos));
+                self.data.put_pixel_modular(x + half, y + stepsize, z + sampler.sample(&mut rng));
             }
         }
     }
@@ -85,6 +87,13 @@ impl DiamondSquareBorderless {
 impl GetData for DiamondSquareBorderless {
     fn get_data(&self) -> &MapData {
         return &self.data;
+    }
+}
+
+
+impl GetDim for DiamondSquareBorderless {
+    fn get_dim(&self) -> u32 {
+        return self.dim;
     }
 }
 
@@ -105,7 +114,7 @@ impl Run for DiamondSquareBorderless {
         }
 
         let mut chaos: f64 = chaos;
-        let damping: f64 = 0.8;
+        let damping: f64 = damping;
 
         while (stepsize) >= 2 {
 
@@ -118,17 +127,15 @@ impl Run for DiamondSquareBorderless {
     }
 }
 
-/*
-impl ToImage for DiamondSquareBorderless {
-    fn to_image(&self, coloring: &str) -> RgbImage {
-        let image = self.data.to_image(coloring);
-        return image;
-    }
-}
-*/
-
 impl Save for DiamondSquareBorderless {}
 
+/* 
+In order to achieve a borderless map the 
+size given for width and height must be
+some multiple of 3.
+Such as : 3, 6, 12, 24, 48, 96, 192, 384, 768
+This restriction should be fixed in the future
+*/
 impl Size for DiamondSquareBorderless {
     fn size(width: u32, height: u32) -> u32 {
         let largest = std::cmp::max(width, height);

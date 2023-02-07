@@ -1,5 +1,5 @@
 use crate::map_data::MapData;
-use crate::algorithms::{GetData, Run, Size, Save, ImageAlg};
+use crate::algorithms::{GetData, GetDim, Run, Size, Save, ImageAlg};
 
 use image::RgbImage;
 use rand::Rng;
@@ -147,6 +147,13 @@ impl ToImage for DiamondSquare {
 impl GetData for DiamondSquare {
     fn get_data(&self) -> &MapData {
         return &self.data;
+    }
+}
+
+
+impl GetDim for DiamondSquare {
+    fn get_dim(&self) -> u32 {
+        return self.dim;
     }
 }
 

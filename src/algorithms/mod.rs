@@ -29,7 +29,11 @@ pub trait GetData {
     fn get_data(&self) -> &MapData;
 }
 
-pub trait ImageAlg: Run + Save + GetData {
+pub trait GetDim {
+    fn get_dim(&self) -> u32;
+}
+
+pub trait ImageAlg: Run + Save + GetData + GetDim {
     fn imagealg(&self) -> &str {
         return "Hello"
     }

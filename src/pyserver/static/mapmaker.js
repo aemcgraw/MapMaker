@@ -1,6 +1,6 @@
 "use strict;"
 
-import init, { makeimage_rainbow, makeimage_bluegreen, MapArgs} from "./pkg/making_maps.js";
+import init, { makeimage, MapArgs} from "./pkg/making_maps.js";
 import { CanvasUtil } from './canvasutil.js';
 import { FileUtil } from './fileutil.js';
 
@@ -8,6 +8,7 @@ function createmap() {
     const canvas = document.getElementById('map-canvas');
     const ctx = canvas.getContext('2d');
 
+    // TODO : This could be more robust
     var algorithm = document.getElementById('algorithm').value;
     var width = parseInt(document.getElementById('widthbox').value);
     var height = parseInt(document.getElementById('heightbox').value);
@@ -16,30 +17,18 @@ function createmap() {
     var damping = parseFloat(document.getElementById('dampingbox').value);
     if (isNaN(damping)) {damping = 0.8;}
     var blocksize = parseInt(document.getElementById('blockbox').value);
+    if (isNaN(blocksize)) {blocksize = width;}
     var coloring = document.getElementById('coloring').value;
     var water = parseFloat(document.getElementById('waterRange').value);
+    if (isNaN(water)) { water = 0.0; }
 
-    const mapargs = new MapArgs(width, height, chaos, damping, blocksize);
+    const mapargs = new MapArgs(width, height, chaos, damping, blocksize, water);
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
         canvas.height = height < 1000 ? height: 1000;
-        switch(algorithm) {
-            case "DiamondSquare":
-                switch(coloring) {
-                    case "BlueGreen":
-                        makeimage_bluegreen(ctx, mapargs, water);
-                        break;
-                    case "Rainbow":
-                        makeimage_rainbow(ctx, mapargs);
-                        break;
-                }
-                break;
-            case "DiamondSquareBorderless":
-                break;
-        }
-        //makeimage(ctx, width, height, coloring, chaos);
-        //makeimage_bluegreen(ctx, width, height, chaos, water);
+
+        makeimage(ctx, mapargs, algorithm, coloring);
     } else if (width == NaN || width == 0) {
         alert('Could not interpret value given for width');
     } else {
@@ -71,6 +60,12 @@ function dothing(ev) {
             break;
         case "Rainbow":
                 var dClassList = document.getElementsByClassName('Rainbow');
+                for (let i = 0; i < dClassList.length; i++) {
+                    dClassList[i].classList.remove('hidden');
+                }
+            break;
+        case "Topographical":
+                var dClassList = document.getElementsByClassName('Topographical');
                 for (let i = 0; i < dClassList.length; i++) {
                     dClassList[i].classList.remove('hidden');
                 }
