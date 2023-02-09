@@ -1,15 +1,21 @@
 from flask import Flask, jsonify, render_template, request, Response
+from werkzeug.utils import secure_filename
 
 from typing import Any, Dict, List, TYPE_CHECKING
 
 from PIL import Image
 
 import os
+import traceback
+import json
+
+import base64
 
 app = Flask(__name__)
 
-uploads_dir = os.path.join(app.instance_path, 'uploads')
-os.makedirs(uploads_dir, exist_ok=True)
+uploads_dir = os.path.join(os.path.dirname(app.instance_path), "uploads")
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir, exist_ok=True)
 
 @app.route('/')
 def index() -> str:
@@ -27,18 +33,19 @@ def savetoserver():
     result['meta'] = {}
     try:
         if request.method == 'POST':
-            #data = request.data
-            #print(type(data))
-            files = request.files
-            file = files.get('file')
-            print(type(file))
+            data = request.get_data()
+            filepath = os.path.join(uploads_dir, secure_filename(request.headers["filename"]))
+            if not filepath.endswith('.png'):
+                filepath = filepath + '.png'
+            with open(filepath, "wb") as binary_file:
+                binary_file.write(data)
     except Exception as e:
         result['meta']['status'] = 'fail'
         result['meta']['reason'] = str(e)
         traceback.print_exc()
     else:
         result['meta']['status'] = 'ok'
-        result['content'] = None
+        result['content'] = filepath
     return jsonify(result)
 
 #TODO : finish typing
@@ -52,8 +59,8 @@ def load() -> Response:
         fulltarget = os.path.join(uploads_dir, target)
         if os.path.isfile(fulltarget):
             if fulltarget.lower().endswith(('.bmp', '.jpg', '.png')):
-                imageobj = Image.open(fulltarget, 'r');
-                imagedata = list(imageobj.getdata());
+                imageobj = Image.open(fulltarget, 'r')
+                imagedata = list(imageobj.getdata())
                 print(imagedata[0])
     except Exception as e:
         result['meta']['status'] = 'fail'

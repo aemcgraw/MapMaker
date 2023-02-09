@@ -30,60 +30,40 @@ var FileUtil = {
 
     save_to_server: function() {
         var url = '/savetoserver/';
+
+        //Convert canvas to base64 encoding
         var canvas = document.getElementById('map-canvas');
+        var imageurl = canvas.toDataURL("image/png");
 
-        canvas.toBlob(function(blob) {
-            var request = new XMLHttpRequest();
-            
-            var data = new FormData();
-            data.append('file', blob);
+        //Convert base64 encoding to binary blob
+        var blobBin = atob(imageurl.split(',')[1]);
+        var array = [];
+        for(var i = 0; i < blobBin.length; i++) {
+            array.push(blobBin.charCodeAt(i));
+        }
+        var imageblob = new Blob([new Uint8Array(array)], {type: 'image/png'});
 
-            request.onload = function() {
-                if (request.status == 200) {
-                    var response = JSON.parse(request.responseText);
-                    if (response['meta']['status'] = 'ok') {
-                        alert("Upload successful");
-                    }
-                } else {
-                    alert("Server Error");
+        var filename = document.getElementById('savefilename').value;
+
+        var request = new XMLHttpRequest();
+        request.onload = function () {
+            if (request.status == 200) {
+                var response = JSON.parse(request.responseText);
+                if (response['meta']['status'] = 'ok') {
+                    alert("Successfully uploaded to " + response['content']);
                 }
-            };
+            } else {
+                alert("Server Error");
+            }
+        };
 
-            request.open("POST", url);
-            request.setRequestHeader("Content-Type", "blob");
-            request.send(data);
-        });
-    },
+        request.open("POST", url);
+        request.setRequestHeader("Content-Type", "image/png");
+        request.setRequestHeader("Filename", filename);
+        request.send(imageblob);
 
-    //save_to_server: function() {
-        //var url = '/savetoserver/';
-        //var canvas = document.getElementById('map-canvas');
-        //var ctx = canvas.getContext('2d');
-        //var image = canvas.toDataURL("image/png");
-        //var imageblob = new Blob(ctx, { type :"image/png" } );
-        //var data = new FormData();
-        //data.append('file', data);
-
-        //var request = new XMLHttpRequest();
-        //request.onload = function () {
-        //    if (request.status == 200) {
-        //        var response = JSON.parse(request.responseText);
-        //        if (response['meta']['status'] = 'ok') {
-        //            alert("Upload successful");
-        //            // TODO: Better upload message
-        //        }
-        //    } else {
-        //        alert("Server Error");
-        //    }
-        //};
-
-        //request.open("POST", url);
-        //request.setRequestHeader("Content-Type", "image/png");
-        //request.send(data);
-
-        // TODO: Save Image
         // TODO: Save complete map data
-    //},
+    },
 
 //    loadfile: function() {
 //        var url = '/load/';
