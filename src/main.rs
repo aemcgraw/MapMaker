@@ -3,6 +3,7 @@ pub mod map_data;
 pub mod config;
 pub mod util;
 pub mod coloring;
+pub mod kdtree;
 
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
@@ -74,7 +75,7 @@ fn main() {
 
     let mut dx = initialize_algorithm(width, height, &algo);
 
-    dx.run(chaos, 0.8);
+    dx.run(chaos, 0.8, width);
     let mapdata = dx.get_data();
 
     let coloring = Coloring::new(mapdata);

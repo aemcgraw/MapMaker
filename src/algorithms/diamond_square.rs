@@ -2,7 +2,6 @@ use crate::map_data::MapData;
 use crate::algorithms::{GetData, GetDim, Run, Size, Save, ImageAlg};
 
 use image::RgbImage;
-use rand::Rng;
 use rand::distributions::{Distribution, Uniform};
 
 pub struct DiamondSquare {
@@ -124,23 +123,6 @@ impl DiamondSquare {
     //        }
     //    }
     //}
-
-/*
-    pub fn to_imagedata(&self, coloring: &str) -> Vec<u8> {
-        let image = self.data.to_imagedata(coloring);
-        return image;
-    }
-
-}
-*/
-
-/*
-impl ToImage for DiamondSquare {
-    fn to_image(&self, algo: &str) -> RgbImage {
-        let image = self.data.to_image(algo);
-        return image;
-    }
-*/
 }
 
 
@@ -160,6 +142,7 @@ impl GetDim for DiamondSquare {
 impl Run for DiamondSquare {
     fn run(&mut self, chaos: f64, damping: f64, blocksize: u32) {
         let mut rng = rand::thread_rng();
+        let sampler = Uniform::new_inclusive(0.0, 1.0);
 
         let mut blocksize = blocksize;
         if (blocksize % 2) != 0 {
@@ -170,9 +153,9 @@ impl Run for DiamondSquare {
             blocksize = x;
         }
 
-        for x in (0..self.dim-1).step_by(blocksize as usize) {
-            for y in (0..self.dim-1).step_by(blocksize as usize) {
-                self.data.put_pixel(x, y, rng.gen_range(0.0..1.0));
+        for x in (0..self.dim).step_by(blocksize as usize) {
+            for y in (0..self.dim).step_by(blocksize as usize) {
+                self.data.put_pixel(x, y, sampler.sample(&mut rng));
             }
         }
 

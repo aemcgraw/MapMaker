@@ -1,7 +1,7 @@
 use image::{RgbImage, Rgb};
 
 use crate::map_data::MapData;
-use crate::util::util;
+use crate::util::util::util;
 
 pub struct Coloring<'a> {
     pub data: &'a MapData,

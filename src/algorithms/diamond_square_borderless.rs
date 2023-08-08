@@ -98,7 +98,7 @@ impl GetDim for DiamondSquareBorderless {
 }
 
 impl Run for DiamondSquareBorderless {
-    fn run(&mut self, chaos: f64, damping: f64, blocksize: u32) {
+    fn run(&mut self, chaos: f64, damping: f64, _blocksize: u32) {
         let mut rng = rand::thread_rng();
 
         let size = self.dim;

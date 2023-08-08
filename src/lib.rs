@@ -11,6 +11,7 @@ use web_sys::{CanvasRenderingContext2d, ImageData};
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
 use algorithms::diamond_square_borderless::DiamondSquareBorderless;
+use util::kdtree::KDTree;
 
 use coloring::coloring::Coloring;
 
@@ -84,4 +85,6 @@ pub fn makeimage(ctx: &CanvasRenderingContext2d, mapargs: MapArgs, algorithm: &s
     let dim = dx.get_dim();
     let imagedata = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut imagevec), dim, dim)?;
     ctx.put_image_data(&imagedata, 0.0, 0.0)
+
+    //return imagevec;
 }

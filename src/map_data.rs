@@ -1,6 +1,6 @@
 use image::{RgbImage, Rgb};
 
-use crate::util::util;
+use crate::util::util::util;
 
 pub struct MapData {
     pub data : Vec<f64>,

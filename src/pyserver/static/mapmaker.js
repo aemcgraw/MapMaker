@@ -28,7 +28,7 @@ function createmap() {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
         canvas.height = height < 1000 ? height: 1000;
 
-        makeimage(ctx, mapargs, algorithm, coloring);
+        var backing_vec = makeimage(ctx, mapargs, algorithm, coloring);
     } else if (width == NaN || width == 0) {
         alert('Could not interpret value given for width');
     } else {
