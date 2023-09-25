@@ -36,6 +36,13 @@ function createmap() {
     }
 }
 
+function updatemap() {
+    const canvas = document.getElementById('map-canvas');
+    const ctx = canvas.getContext('2d');
+
+    var coloring = document.getElementById('coloring').value;
+}
+
 function collapse() {
     document.getElementById('sidebar').classList.toggle('collapsed');
 
@@ -82,6 +89,9 @@ async function run() {
 
     var bmake = document.getElementById('makebutton');
     bmake.addEventListener('click', function() {createmap()})
+
+    var bupdate = document.getElementById('updatebutton');
+    bupdate.addEventListener('click', function() {updatemap()})
 
     var colorselector = document.getElementById('coloring');
     colorselector.addEventListener('change', dothing)

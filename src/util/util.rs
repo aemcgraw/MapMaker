@@ -1,4 +1,4 @@
-pub mod util {
+pub mod Util {
     use crate::util::kdtree::KDTree;
     use rand::distributions::{Distribution, Uniform};
 
@@ -64,15 +64,16 @@ pub mod util {
         println!("{}", std::any::type_name::<T>())
     }
 
-    pub fn generate_kdtree(num_points: u32, min: u32, max: u32) -> KDTree {
-        let sampler = Uniform::new_inclusive(min, max);
+    pub fn generate_kdtree(num_points: u32, width: u32, height: u32) -> KDTree {
+        let sampler = Uniform::new(0, width);
+        let sampler2 = Uniform::new(0, height);
         let mut rng = rand::thread_rng();
 
         let mut points = Vec::new();
 
         let mut x = 0;
         while x < num_points {
-            points.push([sampler.sample(&mut rng), sampler.sample(&mut rng)]);
+            points.push([sampler.sample(&mut rng), sampler2.sample(&mut rng)]);
 
             x += 1;
         }

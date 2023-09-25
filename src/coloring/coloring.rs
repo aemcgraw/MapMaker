@@ -1,7 +1,7 @@
 use image::{RgbImage, Rgb};
 
 use crate::map_data::MapData;
-use crate::util::util::util;
+use crate::util::util::Util;
 
 pub struct Coloring<'a> {
     pub data: &'a MapData,
@@ -10,6 +10,27 @@ pub struct Coloring<'a> {
 impl Coloring<'_> {
     pub fn new(data: &MapData) -> Coloring {
         return Coloring { data };
+    }
+
+    pub fn data_to_binary(&self) -> RgbImage{
+        let map_vec = &self.data;
+
+        let mut output = RgbImage::new(map_vec.width, map_vec.height);
+        let mut counterx = 0;
+        let mut countery = 0;
+
+        for x in &map_vec.data {
+            if x <= &0.0 {
+                output.put_pixel(counterx, countery, Rgb([0, 0, 0]));
+            } else {
+                output.put_pixel(counterx, countery, Rgb([255, 255, 255]));
+            }
+
+            counterx = (counterx + 1) % map_vec.width;
+            if counterx == 0 { countery += 1; }
+        }
+
+        return output;
     }
 
     pub fn data_to_blue_green(&self, waterperc: f64) -> RgbImage {
@@ -22,7 +43,7 @@ impl Coloring<'_> {
 
         let mut tempdata = map_vec.data.clone();
         let initvalue = (tempdata.len() as f64) * waterperc;
-        let water = util::quickselect(&mut tempdata, initvalue as u32);
+        let water = Util::quickselect(&mut tempdata, initvalue as u32);
 
         for x in &map_vec.data {
             let mut rgbvalue = (x * 125.0) as u8;
@@ -38,12 +59,8 @@ impl Coloring<'_> {
                 output.put_pixel(counterx, countery, Rgb([0, rgbvalue, 0]));
             }
 
-            if counterx < map_vec.width - 1 {
-                counterx = counterx + 1;
-            } else {
-                countery = countery + 1;
-                counterx = 0;
-            }
+            counterx = (counterx + 1) % map_vec.width;
+            if counterx == 0 { countery += 1; }
         }
 
         return output;
@@ -54,13 +71,10 @@ impl Coloring<'_> {
 
         let mut data = Vec::new();
 
-        let mut counterx = 0;
-        let mut countery = 0;
-
         let mut tempdata = map_vec.data.clone();
 
         let initvalue = (tempdata.len() as f64) * waterperc;
-        let water = util::quickselect(&mut tempdata, initvalue as u32);
+        let water = Util::quickselect(&mut tempdata, initvalue as u32);
 
         for x in &map_vec.data {
             let mut rgbvalue = (x * 125.0) as u8;
@@ -74,13 +88,6 @@ impl Coloring<'_> {
                 data.append(&mut vec![0, 0, rgbvalue, 255]);
             } else {
                 data.append(&mut vec![0, rgbvalue, 0, 255]);
-            }
-
-            if counterx < map_vec.width - 1 {
-                counterx = counterx + 1;
-            } else {
-                countery = countery + 1;
-                counterx = 0;
             }
         }
 
@@ -128,12 +135,8 @@ impl Coloring<'_> {
 
             output.put_pixel(counterx, countery, Rgb([redv, greenv, bluev]));
 
-            if counterx < map_vec.width - 1 {
-                counterx = counterx + 1;
-            } else {
-                countery = countery + 1;
-                counterx = 0;
-            }
+            counterx = (counterx + 1) % map_vec.width;
+            if counterx == 0 { countery += 1; }
         }
 
         return output;
@@ -170,22 +173,12 @@ impl Coloring<'_> {
 
         let mut data = Vec::new();
 
-        let mut counterx = 0;
-        let mut countery = 0;
-
         for x in &map_vec.data {
             let greenv: u8 = normalize(x, 0.0);
             let bluev: u8 = normalize(x, 0.33);
             let redv: u8 = normalize_edge(x);
 
             data.append(&mut vec![redv, greenv, bluev, 255]);
-
-            if counterx < map_vec.width - 1 {
-                counterx = counterx + 1;
-            } else {
-                countery = countery + 1;
-                counterx = 0;
-            }
         }
 
         return data;
@@ -193,9 +186,6 @@ impl Coloring<'_> {
 
     pub fn data_to_topographical_vec(&self, water: Option<f64>) -> Vec<u8> {
         let map_vec = &self.data;
-
-        let mut counterx = 0;
-        let mut countery = 0;
 
         let waterperc = match water {
             Some(w) => w,
@@ -205,7 +195,7 @@ impl Coloring<'_> {
         let mut data = Vec::new();
         let mut tempdata = map_vec.data.clone();
         let initvalue = (tempdata.len() as f64) * waterperc;
-        let waterheight = util::quickselect(&mut tempdata, initvalue as u32);
+        let waterheight = Util::quickselect(&mut tempdata, initvalue as u32);
 
         for x in &map_vec.data {
             let fract = (x * 10.0).fract();
@@ -216,13 +206,6 @@ impl Coloring<'_> {
                 data.append(&mut vec![0, 0, 0, 255]);
             } else {
                 data.append(&mut vec![255, 255, 255, 255]);
-            }
-
-            if counterx < map_vec.width - 1 {
-                counterx = counterx + 1
-            } else {
-                countery = countery + 1;
-                counterx = 0;
             }
         }
 

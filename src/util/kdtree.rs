@@ -138,6 +138,27 @@ impl KDTree {
         }
     }
 
+    pub fn nearest_neighbor(&self, target: [u32; 2], nearest: [u32; 2]) -> [u32; 2] {
+        let new_nearest = if target[self.axis as usize] <= self.point[self.axis as usize] {
+            match &self.left_tree {
+                Some(x) => x.nearest_neighbor(target, nearest),
+                None => self.point
+            }
+        } else {
+            match &self.right_tree {
+                Some(x) => x.nearest_neighbor(target, nearest),
+                None => self.point
+            }
+        };
+
+        let c_axis = self.axis as usize;
+        if ((self.point[c_axis] - new_nearest[c_axis]) as i32).abs() < ((self.point[c_axis] - nearest[c_axis]) as i32).abs() {
+            return new_nearest
+        } else {
+            return nearest
+        }
+    }
+
     pub fn remove(&mut self, target: [u32; 2]) {
         let points_below = self.collect_points_below();
 

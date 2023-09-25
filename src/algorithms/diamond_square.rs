@@ -11,6 +11,11 @@ pub struct DiamondSquare {
 }
 
 impl DiamondSquare {
+    //The Diamond-Square Algorithm is only (currently) implemented against 
+    // square maps of side length in pixels of the form ((2 ^ n) + 1).
+    //To this end if the requested image has a different size we produce a map of 
+    // the smallest size that can contain the requested size and then simply
+    // compress the resulting map to the requested size.
     pub fn new(width: u32, height: u32) -> DiamondSquare {
         let bsize = DiamondSquare::size(width, height);
 
@@ -144,11 +149,12 @@ impl Run for DiamondSquare {
         let mut rng = rand::thread_rng();
         let sampler = Uniform::new_inclusive(0.0, 1.0);
 
+        //blocksize must be a power of 2 and less than or equal to the edge length of the map
         let mut blocksize = blocksize;
-        if (blocksize % 2) != 0 {
+        if (blocksize as f32).log2().fract() != 0.0 {
             let mut x: u32 = 1;
-            while x < blocksize {
-                x = x * 2
+            while x < blocksize && (x * 2) < self.dim {
+                x = x * 2;
             }
             blocksize = x;
         }
@@ -174,6 +180,7 @@ impl Run for DiamondSquare {
 
 impl Save for DiamondSquare {}
 
+//Returns 1 more than the smallest power of 2 greater than or equal to max(width, height)
 impl Size for DiamondSquare {
     fn size(width: u32, height: u32) -> u32 {
         let largest = std::cmp::max(width, height);

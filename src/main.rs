@@ -3,7 +3,6 @@ pub mod map_data;
 pub mod config;
 pub mod util;
 pub mod coloring;
-pub mod kdtree;
 
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
@@ -14,7 +13,7 @@ use coloring::coloring::Coloring;
 use clap::Parser;
 use image::imageops;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 struct Cli {
     width: u32,
     height: u32,
