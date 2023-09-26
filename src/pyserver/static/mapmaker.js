@@ -18,11 +18,13 @@ function createmap() {
     if (isNaN(damping)) {damping = 0.8;}
     var blocksize = parseInt(document.getElementById('blockbox').value);
     if (isNaN(blocksize)) {blocksize = width;}
+    var seed = parseInt(document.getElementById('seedbox').value);
+    if (isNaN(seed)) {seed = 0;}
     var coloring = document.getElementById('coloring').value;
     var water = parseFloat(document.getElementById('waterRange').value);
     if (isNaN(water)) { water = 0.0; }
 
-    const mapargs = new MapArgs(width, height, chaos, damping, blocksize, water);
+    const mapargs = new MapArgs(width, height, chaos, damping, blocksize, water, seed);
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000

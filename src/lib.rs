@@ -8,6 +8,9 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::Clamped;
 use web_sys::{CanvasRenderingContext2d, ImageData};
 
+use rand::distributions::Uniform;
+use rand::Rng;
+
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
 use algorithms::diamond_square_borderless::DiamondSquareBorderless;
@@ -33,14 +36,15 @@ pub struct MapArgs {
     pub chaos: f64,
     pub damping: f64,
     pub blocksize: u32,
-    pub waterlevel: f64
+    pub waterlevel: f64,
+    pub seed: u32,
 }
 
 #[wasm_bindgen]
 impl MapArgs {
     #[wasm_bindgen(constructor)]
-    pub fn new(width: u32, height: u32, chaos: f64, damping: f64, blocksize: u32, waterlevel: f64) -> MapArgs {
-        MapArgs { width, height, chaos, damping, blocksize, waterlevel }
+    pub fn new(width: u32, height: u32, chaos: f64, damping: f64, blocksize: u32, waterlevel: f64, seed: u32) -> MapArgs {
+        MapArgs { width, height, chaos, damping, blocksize, waterlevel, seed }
     }
 
     pub fn get_width(&self) -> u32 { return self.width }
@@ -49,15 +53,23 @@ impl MapArgs {
     pub fn get_damping(&self) -> f64 { return self.damping }
     pub fn get_blocksize(&self) -> u32 { return self.blocksize }
     pub fn get_waterlevel(&self) -> f64 { return self.waterlevel }
+    pub fn get_seed(&self) -> u64 {
+        if self.seed == 0 {
+            let mut rng = rand::thread_rng();
+            return rng.gen_range(0..u64::MAX);
+        } else {
+            return self.seed.into();
+        }   
+    }
 }
 
-fn initialize_algorithm(width: u32, height: u32, algorithm: &str) -> Box<dyn ImageAlg> {
+fn initialize_algorithm(width: u32, height: u32, seed: u64, algorithm: &str) -> Box<dyn ImageAlg> {
     match algorithm {
-        "DiamondSquare" | "ds" => Box::new(DiamondSquare::new(width, height)),
-        "DiamondSquareBorderless" | "dsb" => Box::new(DiamondSquareBorderless::new(width, height)),
+        "DiamondSquare" | "ds" => Box::new(DiamondSquare::new(width, height, seed)),
+        "DiamondSquareBorderless" | "dsb" => Box::new(DiamondSquareBorderless::new(width, height, seed)),
          _ => {
             println!("Provided algorithm {} not recognized. Defaulting to DiamondSquare", algorithm);
-            Box::new(DiamondSquare::new(width, height))
+            Box::new(DiamondSquare::new(width, height, seed))
         }
     }
 }
@@ -69,7 +81,7 @@ pub fn makeimage(ctx: &CanvasRenderingContext2d, mapargs: MapArgs, algorithm: &s
 
     console_log!("Algorithm: {}", coloring);
 
-    let mut dx = initialize_algorithm(mapargs.get_width(), mapargs.get_height(), algorithm);
+    let mut dx = initialize_algorithm(mapargs.get_width(), mapargs.get_height(), mapargs.get_seed(), algorithm);
 
     dx.run(mapargs.get_chaos(), mapargs.get_damping(), mapargs.get_blocksize());
 
@@ -88,3 +100,13 @@ pub fn makeimage(ctx: &CanvasRenderingContext2d, mapargs: MapArgs, algorithm: &s
 
     //return imagevec;
 }
+
+//#[wasm_bindgen]
+//pub fn updateimage(ctx: &CanvasRendeingContext2d, coloring: &str) -> Result<(), JsValue> {
+//    #[cfg(debug_assertions)]
+//    console_error_panic_hook::set_once();
+
+//    console_log!("Algorithm: {}", coloring);
+
+//    let mut dx = initialize_a
+//}
