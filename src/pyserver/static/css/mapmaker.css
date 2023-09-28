@@ -18,6 +18,12 @@
     height: calc(100vh - var(--nav-height) - var(--header-height));
 }
 
+#infothumb {
+    height: 20px;
+    float: right;
+    padding-right: 7px;
+}
+
 #mainpage {
     background-color: #101010;
     /*border: 1px solid black;*/
@@ -25,6 +31,7 @@
     grid-row: 1 / 2;
     padding: 15px;
     position: relative;
+    overflow: hidden;
 }
 
 #sidebar {
@@ -35,13 +42,11 @@
     grid-column: 3 / 4;
     grid-row: 1 / 2;
     padding: 5px;
-    overflow: scroll;
     vertical-align: top;
-    z-index: 2;
 }
 
 #options {
-    padding: 7px;
+    padding: 2px;
 }
 
 #options-collapse {
@@ -49,7 +54,6 @@
     border-color: Black;
     grid-column: 2 / 3;
     grid-row: 1 / 2;
-    z-index: 2;
 }
 
 #reset {
@@ -84,7 +88,6 @@
 
 header {
     background-color: #202020;
-    /*border: 1px solid black;*/
     color: White;
     font-size: 1.5rem;
     padding: 4px 0px 4px 10px;
@@ -93,12 +96,7 @@ header {
 }
 
 nav {
-    /*background-color: #d6cfbf;*/
     background-color: #323232;
-    /* border-top: 0px;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black; */
     color: White;
     font-size: 1rem;
     top: 0;
@@ -183,7 +181,11 @@ nav div ul li.selected {
     -webkit-justify-content: flex-end;
 }
 
-.float-right {
+.float-left, .fl-left {
+    float: left;
+}
+
+.float-right, .fl-right {
     float: right;
 }
 
@@ -227,6 +229,29 @@ nav div ul li.selected {
     height: 15px;
 }
 
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px solid white;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: white;
+    position: absolute;
+    text-align: left;
+    padding: 5px;
+    border-radius: 6px;
+    top: -5px;
+    right: 105%;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
 .width70 {
     width: 70%
 }
@@ -246,8 +271,4 @@ ul li {
 
 select {
     width: 100%;
-}
-
-input {
-    float: right;
 }

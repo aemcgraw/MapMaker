@@ -20,6 +20,7 @@ function createmap() {
     if (isNaN(blocksize)) {blocksize = width;}
     var seed = parseInt(document.getElementById('seedbox').value);
     if (isNaN(seed)) {seed = 0;}
+    console.log(seed);
     var coloring = document.getElementById('coloring').value;
     var water = parseFloat(document.getElementById('waterRange').value);
     if (isNaN(water)) { water = 0.0; }
@@ -36,13 +37,6 @@ function createmap() {
     } else {
         alert('Could not interpret value given for height');
     }
-}
-
-function updatemap() {
-    const canvas = document.getElementById('map-canvas');
-    const ctx = canvas.getContext('2d');
-
-    var coloring = document.getElementById('coloring').value;
 }
 
 function collapse() {
@@ -91,9 +85,6 @@ async function run() {
 
     var bmake = document.getElementById('makebutton');
     bmake.addEventListener('click', function() {createmap()})
-
-    var bupdate = document.getElementById('updatebutton');
-    bupdate.addEventListener('click', function() {updatemap()})
 
     var colorselector = document.getElementById('coloring');
     colorselector.addEventListener('change', dothing)

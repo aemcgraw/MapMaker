@@ -23,7 +23,10 @@
     </header>
     <div id="container" class="dataview">
         <div id="sidebar" class='near-white'>
-            <h4>Options</h4>
+            <h4>
+                Options
+                <img src="static/images/400px-Icon-round-Question_mark.svg.png" id="infothumb" title="Mouseover each option for more information">
+            </h4>
             <ul id="options">
                 <li>
                     <select name="algorithm" id="algorithm" autocomplete="off">
@@ -32,31 +35,73 @@
                     </select>
                 </li>
                 <li id='width'>
-                    Width:
-                    <input id="widthbox" class="width70" type="text" name="widthbox" placeholder="width in pixels">
+                    <div class="tooltip">Width
+                        <span class="tooltiptext">
+                            <div>
+                            Map Width in Pixels
+                            </div>
+                        </span>
+                    </div>
+                    <input id="widthbox" class="width70 fl-right" type="text" name="widthbox">
                 </li>
                 <li id='height'>
-                    Height:
-                    <input id="heightbox" class="width70" type="text" name="heightbox" placeholder="height in pixels">
+                    <div class="tooltip">Height
+                        <span class="tooltiptext">
+                            <div>
+                            Map Height in Pixels
+                            </div>
+                        </span>
+                    </div>
+                    <input id="heightbox" class="width70 fl-right" type="text" name="heightbox" placeholder="height in pixels">
                 </li>
                 <li id='chaos'>
-                    Chaos:
-                    <input id="chaosbox" class="width70" type="text" name="chaosbox" placeholder="spikiness, usually 0 - 1">
+                    <div class="tooltip">Chaos
+                        <span class="tooltiptext">
+                            <div>
+                                Approximately represents the macro-level topographical variation of the map. <br>
+                                Typical values: 0 - 1 <br>
+                                Default value: 0.5
+                            </div>
+                        </span>
+                    </div>
+                    <input id="chaosbox" class="width70 fl-right" type="text" name="chaosbox">
                 </li>
                 <li id='damping'>
-                    Damping:
-                    <input id="dampingbox" class="width70" type="text" name="dampingbox" placeholder="amount to scale chaos per round">
+                    <div class="tooltip">Damping
+                        <span class="tooltiptext">
+                            <div>
+                                Approximately represents the micro-level topographical variation of the map. <br>
+                                Typical values: 0 - 1 <br>
+                                Default value: 0.8
+                            </div>
+                        </span>
+                    </div>
+                    <input id="dampingbox" class="width70 fl-right" type="text" name="dampingbox">
                 </li>
                 <li id='blocksize'>
-                    Blocksize:
-                    <input id="blockbox" class="width70" type="text" name="blockbox">
+                    <div class="tooltip">Blocksize
+                        <span class="tooltiptext">
+                            <div>
+                                The width/height in pixels of a region of the map.<br>
+                                This should be a value less than the minimum of the width and height of the map.
+                            </div>
+                        </span>
+                    </div>
+                    <input id="blockbox" class="width70 fl-right" type="text" name="blockbox">
                 </li>
                 <li id='seed'>
-                    Seed:
-                    <input id="seedbox" class="width70" type="text" name="seedbox">
+                    <div class="tooltip">Seed
+                        <span class="tooltiptext">
+                            <div>
+                                Integer value used to seed the map generation.<br>
+                                A map can be refined by changing other settings and leaving the seed fixed.<br>
+                                If this field is blank or set to 0 a random seed will be used instead.
+                            </div>
+                        </span>
+                    </div>
+                    <input id="seedbox" class="width70 fl-right" type="number" name="seedbox" min="0" max"4294967295">
                 </li>
                 <li></li>
-
                 <li>
                     <select name="coloring" id="coloring" autocomplete="off">
                     <option value="BlueGreen">BlueGreen</option>
@@ -67,33 +112,31 @@
 
                 <span class="BlueGreen Color Topographical">
                 <li>
-                    Water: 
+                    <div class="tooltip">Water
+                        <span class="tooltiptext">
+                            <div>
+                                Water level of the map as a percentage.<br>
+                                e.g a value of 70 will result in a map that is 70% water
+                            </div>
+                        </span>
+                    </div>
                     <span id="waterRangeValue" class="float-right">0.5</span>
-                    <input type="range" oninput="waterRangeValue.innerText=this.value" min="0" max="1" value="0.5" step="0.01" class="slider" id="waterRange">
-                    <!-- Water:
-                    <input id="waterbox" type="text" name="waterbox" placeholder="%water on map"> -->
+                    <input type="range" class="fl-right" oninput="waterRangeValue.innerText=this.value" min="0" max="1" value="0.5" step="0.01" class="slider" id="waterRange">
                 </li>
                 </span>
 
                 <li id='generate'>
                     <button id="makebutton">Make</button>
-                    <button id="updatebutton">Update</button>
                 </li>
 
                 <li></li>
                 <li>
-                    <label for="savefilename">File:</label>
-                    <input id="savefilename" type="text" placeholder="myfile.txt"></input>
+                    <input id="savefilename" class="fl-left width70" type="text" placeholder="Save Map to File"></input>
+                    <button id="save" class="fl-right">Save</button>
                 </li>
                 <li>
-                    <button id="save">Save</button>
-                </li>
-                <li>
-                    <label for="loadfilename">File:</label>
-                    <input id="loadfilename" type="text" placeholder="myfile.txt"></input>
-                </li>
-                <li>
-                    <button id="load">Load</button>
+                    <input id="loadfilename" class="fl-left width70" type="text" placeholder="Load Map from File"></input>
+                    <button id="load" class="fl-right">Load</button>
                 </li>
             </ul>
         </div>
