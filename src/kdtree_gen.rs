@@ -69,12 +69,12 @@ fn main() {
     //let verbose = args.verbose;
 
     let kdt = Util::generate_kdtree(points, width, height);
-    let mapdata = MapData::mapdata_from_points(kdt.collect_points_below(), width, height);
+    let mapdata = MapData::mapdata_from_points(kdt.collect_points(true), width, height);
 
-    let coloring = Coloring::new(&mapdata);
-    let image = coloring.data_to_binary();
+    let mut coloring = Coloring::new(&mapdata, "binary");
+    let image = coloring.get_image();
 
-    let reimage = imageops::resize(&image, width, height, imageops::FilterType::Nearest);
+    let reimage = imageops::resize(image, width, height, imageops::FilterType::Nearest);
     FileUtil::save(reimage, &output);
 
     ()
