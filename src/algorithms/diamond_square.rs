@@ -1,13 +1,11 @@
 use crate::map_data::MapData;
 use crate::algorithms::{GetData, GetDim, Run, Size, Save, ImageAlg};
 
-use image::RgbImage;
 use rand::distributions::{Distribution, Uniform};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 
 pub struct DiamondSquare {
-    image : RgbImage,
     data : MapData,
     pub dim : u32,
     algrng : StdRng,
@@ -25,7 +23,7 @@ impl DiamondSquare {
         let vec_size = bsize * bsize;
         let backing_data : Vec<f64> = vec!(0.0; vec_size as usize);
         let this_rng = SeedableRng::seed_from_u64(seed);
-        return DiamondSquare { image : RgbImage::new(bsize, bsize), data : MapData::new(backing_data, bsize, bsize), dim : bsize, algrng : this_rng }
+        return DiamondSquare { data : MapData::new(backing_data, bsize, bsize), dim : bsize, algrng : this_rng }
     }
 
     fn diamond(&mut self, stepsize : u32, chaos: f64) {

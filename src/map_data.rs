@@ -1,6 +1,6 @@
 use image::{RgbImage, Rgb};
 
-use crate::util::util::Util;
+use crate::utilities::util::util;
 
 pub struct MapData {
     pub data : Vec<f64>,
@@ -53,8 +53,8 @@ impl MapData{
     }
 
     pub fn get_pixel_modular(&self, x: u32, y: u32) -> f64 {
-        let new_x = Util::modu(x, self.width);
-        let new_y = Util::modu(y, self.height);
+        let new_x = util::modu(x, self.width);
+        let new_y = util::modu(y, self.height);
 
         let index = (new_y * self.width + new_x) as usize;
         return self.data[index];
@@ -68,11 +68,31 @@ impl MapData{
     }
 
     pub fn put_pixel_modular(&mut self, x: u32, y: u32, a: f64) {
-        let new_x = Util::modu(x, self.width);
-        let new_y = Util::modu(y, self.height);
+        let new_x = util::modu(x, self.width);
+        let new_y = util::modu(y, self.height);
 
         let index = (new_y * self.width + new_x) as usize;
         self.data[index] = a;
+    }
+
+    pub fn get_local_maxima(&self) -> Vec<u32> {
+        let mut maxima = Vec::new();
+
+        for i in 0..(self.width-1) {
+            for j in 0..(self.height-1) {
+                let this_point = self.get_pixel(i, j);
+                let left_point = if i > 0 { self.get_pixel( i-1, j) } else { f64::MIN };
+                let right_point = if i > 0 &&(i - 1) < self.width { self.get_pixel( i+1, j) } else { f64::MIN };
+                let top_point = if j > 0 { self.get_pixel( i, j-1) } else { f64::MIN };
+                let bottom_point = if j > 0 && (j - 1) < self.height { self.get_pixel( i, j+1) } else { f64::MIN };
+
+                if this_point == ((((this_point.max(left_point)).max(right_point)).max(top_point)).max(bottom_point)) {
+                    maxima.push(j * self.width + i)
+                }
+            }
+        }
+
+        return maxima;
     }
 
     /*

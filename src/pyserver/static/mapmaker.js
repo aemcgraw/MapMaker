@@ -25,13 +25,14 @@ function createmap() {
     var water = parseFloat(document.getElementById('waterRange').value);
     if (isNaN(water)) { water = 0.0; }
 
-    const mapargs = new MapArgs(width, height, chaos, damping, blocksize, water, seed);
+    const mapargs = new MapArgs(width, height, chaos, damping, blocksize, seed);
+    const colorargs = new ColorArgs(water);
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
         canvas.height = height < 1000 ? height: 1000;
 
-        var backing_vec = makeimage(ctx, mapargs, algorithm, coloring);
+        var backing_vec = makeimage(ctx, mapargs, colorargs, algorithm, coloring);
     } else if (width == NaN || width == 0) {
         alert('Could not interpret value given for width');
     } else {

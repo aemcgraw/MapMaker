@@ -1,10 +1,9 @@
 pub mod diamond_square;
 pub mod diamond_square_borderless;
 
-use crate::util::file_util::FileUtil;
+use crate::utilities::file_util::file_util;
 use crate::map_data::MapData;
-use image::RgbImage;
-//use std::path::Path;
+use image::{RgbaImage};
 
 pub trait Run {
     fn run(&mut self, chaos: f64, damping: f64, blocksize: u32);
@@ -15,10 +14,8 @@ pub trait Size {
 }
 
 pub trait Save {
-    fn save(&self, image: RgbImage, name: &String) {
-        FileUtil::save(image, name);
-        //let save_path = Path::new(config::OUTPUT_DIR).join(Path::new(name));
-        //image.save(save_path).expect("Couldn't save image");
+    fn save(&self, image: RgbaImage, name: &String) {
+        file_util::save(image, name);
     }
 }
 

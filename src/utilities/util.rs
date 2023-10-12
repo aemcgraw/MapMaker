@@ -1,5 +1,5 @@
-pub mod Util {
-    use crate::util::kdtree::KDTree;
+pub mod util {
+    use crate::utilities::kdtree::KDTree;
     use rand::distributions::{Distribution, Uniform};
 
     pub fn modu(dividend: u32, divisor: u32) -> u32 {

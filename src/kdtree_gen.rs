@@ -1,18 +1,15 @@
 pub mod algorithms;
 pub mod map_data;
 pub mod config;
-pub mod util;
+pub mod utilities;
 pub mod coloring;
-
-use algorithms::ImageAlg;
-use algorithms::diamond_square::DiamondSquare;
-use algorithms::diamond_square_borderless::DiamondSquareBorderless;
 
 use coloring::coloring::Coloring;
 
 use map_data::MapData;
-use util::util::Util;
-use util::file_util::FileUtil;
+use utilities::util::util;
+
+use utilities::file_util::file_util;
 
 use clap::Parser;
 use image::imageops;
@@ -47,17 +44,6 @@ struct Cli {
     verbose: bool
 }
 
-//fn initialize_algorithm(width: u32, height: u32, algorithm: &str) -> Box<dyn ImageAlg> {
-//    match algorithm {
-//        "DiamondSquare" | "ds" => Box::new(DiamondSquare::new(width, height)),
-//        "DiamondSquareBorderless" | "dsb" => Box::new(DiamondSquareBorderless::new(width, height)),
-//        _ => {
-//            println!("Provided algorithm {} not recognized. Defaulting to DiamondSquare", algorithm);
-//            Box::new(DiamondSquare::new(width, height))
-//        }
-//    }
-//}
-
 fn main() {
     let args = Cli::parse();
 
@@ -65,17 +51,17 @@ fn main() {
     let height = args.height;
     let points = args.points;
     let output = args.path;
-    let coloring = args.coloring;
+    let _coloring = args.coloring;
     //let verbose = args.verbose;
 
-    let kdt = Util::generate_kdtree(points, width, height);
+    let kdt = util::generate_kdtree(points, width, height);
     let mapdata = MapData::mapdata_from_points(kdt.collect_points(true), width, height);
 
     let mut coloring = Coloring::new(&mapdata, "binary");
     let image = coloring.get_image();
 
     let reimage = imageops::resize(image, width, height, imageops::FilterType::Nearest);
-    FileUtil::save(reimage, &output);
+    file_util::save(reimage, &output);
 
     ()
 }

@@ -1,7 +1,7 @@
 pub mod algorithms;
 pub mod map_data;
 pub mod config;
-pub mod util;
+pub mod utilities;
 pub mod coloring;
 
 use algorithms::ImageAlg;
@@ -43,6 +43,13 @@ struct Cli {
     )]
     chaos: f64,
 
+    #[clap(short = 's',
+        long = "seed",
+        default_value = "0",
+        help = "Value to seed the map generation."
+    )]
+    seed: u64,
+
     #[clap(short = 'v',
         long = "verbose",
         help = "Print verbose output"
@@ -50,13 +57,13 @@ struct Cli {
     verbose: bool
 }
 
-fn initialize_algorithm(width: u32, height: u32, algorithm: &str) -> Box<dyn ImageAlg> {
+fn initialize_algorithm(width: u32, height: u32, seed: u64, algorithm: &str) -> Box<dyn ImageAlg> {
     match algorithm {
-        "DiamondSquare" | "ds" => Box::new(DiamondSquare::new(width, height)),
-        "DiamondSquareBorderless" | "dsb" => Box::new(DiamondSquareBorderless::new(width, height)),
+        "DiamondSquare" | "ds" => Box::new(DiamondSquare::new(width, height, seed)),
+        "DiamondSquareBorderless" | "dsb" => Box::new(DiamondSquareBorderless::new(width, height, seed)),
         _ => {
             println!("Provided algorithm {} not recognized. Defaulting to DiamondSquare", algorithm);
-            Box::new(DiamondSquare::new(width, height))
+            Box::new(DiamondSquare::new(width, height, seed))
         }
     }
 }
@@ -70,19 +77,30 @@ fn main() {
     let coloring = args.coloring;
     let algo = args.algorithm;
     let chaos = args.chaos;
+    let seed = args.seed;
     //let verbose = args.verbose;
 
-    let mut dx = initialize_algorithm(width, height, &algo);
+    let mut dx = initialize_algorithm(width, height, seed, &algo);
 
     dx.run(chaos, 0.8, width);
     let mapdata = dx.get_data();
 
-    let coloring = Coloring::new(mapdata);
+    let _maxima = mapdata.get_local_maxima();
+    //println!("{:?}", maxima);
 
-    let image = coloring.data_to_blue_green(0.9);
+    let mut coloring = Coloring::new(mapdata, &algo);
+    //coloring.data_to_blue_green(0.9);
+    let image = coloring.get_image();
 
-    let reimage = imageops::resize(&image, width, height, imageops::FilterType::Nearest);
+    let reimage = imageops::resize(image, width, height, imageops::FilterType::Nearest);
     dx.save(reimage, &output);
 
     ()
 }
+
+/*
+fn test() {
+    let mut dx = initialize_algorithm(128, 128, 1, "DiamondSquare");
+    dx.run(chaos, 0.8, width);
+}
+*/
