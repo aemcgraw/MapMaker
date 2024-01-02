@@ -104,9 +104,10 @@
                 <li></li>
                 <li>
                     <select name="coloring" id="coloring" autocomplete="off">
-                    <option value="BlueGreen">BlueGreen</option>
-                    <option value="Rainbow">Rainbow</option>
-                    <option value="Topographical">Topographical</option>
+                    <option value="1">BlueGreen</option>
+                    <option value="2">Rainbow</option>
+                    <option value="3">Topographical</option>
+                    <option value="4">Binary</option>
                     </select>
                 </li>
 
@@ -124,7 +125,17 @@
                     <input type="range" class="fl-right" oninput="waterRangeValue.innerText=this.value" min="0" max="1" value="0.5" step="0.01" class="slider" id="waterRange">
                 </li>
                 </span>
-
+                <li>
+                    <div class="tooltip">Dark
+                        <span class="tooltiptext">
+                            <div>
+                                Darkness
+                            </div>
+                        </span>
+                    </div>
+                    <span id="darkRangeValue" class="float-right">1.0</span>
+                    <input type="range" class="fl-right" oninput="darkRangeValue.innerText=this.value" min="0" max="1" value="1.0" step="0.01" class="slider" id="darkRange">
+                </li>
                 <li id='generate'>
                     <button id="makebutton">Make</button>
                 </li>

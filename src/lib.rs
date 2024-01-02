@@ -62,16 +62,20 @@ impl MapArgs {
 
 #[wasm_bindgen]
 pub struct ColorArgs {
+    pub coloring: u32,
+    pub darklevel: f64,
     pub waterlevel: f64,
 }
 
 #[wasm_bindgen]
 impl ColorArgs {
     #[wasm_bindgen(constructor)]
-    pub fn new(waterlevel: f64) -> ColorArgs {
-        ColorArgs { waterlevel }
+    pub fn new(coloring: u32, darklevel: f64, waterlevel: f64) -> ColorArgs {
+        ColorArgs { coloring, darklevel, waterlevel }
     }
 
+    pub fn get_coloring(&self) -> u32 { return self.coloring }
+    pub fn get_darklevel(&self) -> f64 { return self.darklevel }
     pub fn get_waterlevel(&self) -> f64 { return self.waterlevel }
 }
 
@@ -87,25 +91,19 @@ fn initialize_algorithm(width: u32, height: u32, seed: u64, algorithm: &str) -> 
 }
 
 #[wasm_bindgen]
-pub fn makeimage(ctx: &CanvasRenderingContext2d, mapargs: MapArgs, colorargs: ColorArgs, algorithm: &str, coloring: &str) -> Result<(), JsValue> {
+pub fn makeimage(ctx: &CanvasRenderingContext2d, mapargs: MapArgs, colorargs: ColorArgs, algorithm: &str) -> Result<(), JsValue> {
     #[cfg(debug_assertions)]
     console_error_panic_hook::set_once();
 
-    console_log!("Algorithm: {}", coloring);
+    //console_log!("Algorithm: {}", coloring);
 
     let mut dx = initialize_algorithm(mapargs.get_width(), mapargs.get_height(), mapargs.get_seed(), algorithm);
 
     dx.run(mapargs.get_chaos(), mapargs.get_damping(), mapargs.get_blocksize());
 
     let mapdata = dx.get_data();
-    let mut colordata = Coloring::new(mapdata, algorithm);
+    let mut colordata = Coloring::new(mapdata, colorargs);
     let mut imagevec = colordata.get_vec();
-    //let mut imagevec = match coloring {
-    //    "BlueGreen" => colordata.data_to_blue_green_vec(colorargs.get_waterlevel()),
-    //    "Rainbow" => colordata.data_to_rainbow_vec(),
-    //    "Topographical" => colordata.data_to_topographical_vec(Some(colorargs.get_waterlevel())),
-    //    _ => colordata.data_to_blue_green_vec(colorargs.get_waterlevel())
-    //};
 
     let dim = dx.get_dim();
     let imagedata = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut imagevec), dim, dim)?;

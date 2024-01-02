@@ -1,6 +1,6 @@
 "use strict;"
 
-import init, { makeimage, MapArgs} from "./pkg/making_maps.js";
+import init, { makeimage, MapArgs, ColorArgs } from "./pkg/making_maps.js";
 import { CanvasUtil } from './canvasutil.js';
 import { FileUtil } from './fileutil.js';
 
@@ -21,18 +21,22 @@ function createmap() {
     var seed = parseInt(document.getElementById('seedbox').value);
     if (isNaN(seed)) {seed = 0;}
     console.log(seed);
-    var coloring = document.getElementById('coloring').value;
+    var coloring = parseInt(document.getElementById('coloring').value);
+    if (isNaN(coloring)) {coloring = 1;}
+    var dark = parseFloat(document.getElementById('darkRange').value);
+    if (isNaN(dark)) { dark = 1.0; }
+    console.log('Dark: ' + dark);
     var water = parseFloat(document.getElementById('waterRange').value);
     if (isNaN(water)) { water = 0.0; }
 
     const mapargs = new MapArgs(width, height, chaos, damping, blocksize, seed);
-    const colorargs = new ColorArgs(water);
+    const colorargs = new ColorArgs(coloring, dark, water);
 
     if (!isNaN(width) && width != "0" && !isNaN(height) && height != "0") {
         canvas.width = width < 1000 ? width : 1000;     //Set maximum allowed map height and width to 1000
         canvas.height = height < 1000 ? height: 1000;
 
-        var backing_vec = makeimage(ctx, mapargs, colorargs, algorithm, coloring);
+        var backing_vec = makeimage(ctx, mapargs, colorargs, algorithm);
     } else if (width == NaN || width == 0) {
         alert('Could not interpret value given for width');
     } else {

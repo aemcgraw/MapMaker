@@ -25,7 +25,7 @@ struct Cli {
     algorithm: String,
 
     #[clap(short, long, 
-        default_value = "bluegreen",
+        default_value = "BlueGreen",
         help = "Process for coloring the resulting terrain:\n Options: \n\trainbow,\n\tbluegreen\n"
     )]
     coloring: String,
@@ -88,7 +88,7 @@ fn main() {
     let _maxima = mapdata.get_local_maxima();
     //println!("{:?}", maxima);
 
-    let mut coloring = Coloring::new(mapdata, &algo);
+    let mut coloring = Coloring::new(mapdata, &coloring);
     //coloring.data_to_blue_green(0.9);
     let image = coloring.get_image();
 
@@ -99,6 +99,8 @@ fn main() {
 }
 
 /*
+#[allow(soft_unstable)]
+#[bench]
 fn test() {
     let mut dx = initialize_algorithm(128, 128, 1, "DiamondSquare");
     dx.run(chaos, 0.8, width);

@@ -3,12 +3,15 @@ use image::{RgbaImage, Rgba};
 use crate::map_data::MapData;
 use crate::utilities::util::util;
 
+use crate::ColorArgs;
+
 pub struct Coloring<'a> {
     pub data: &'a MapData,
     pub colormod: ColorModel,
     pub image: Option<RgbaImage>,
     pub imagevec: Option<Vec<u8>>,
     pub waterlevel: f64,
+    pub darklevel: u8,
 }
 
 pub enum ColorModel {
@@ -33,12 +36,12 @@ enum OutputFormat {
 //}
 
 impl Coloring<'_> {
-    pub fn new<'a>(data: &'a MapData, color: &str) -> Coloring<'a> {
-        let coloring = match color {
-            "binary" => ColorModel::Binary,
-            "bluegreen" => ColorModel::BlueGreen,
-            "rainbow" => ColorModel::Rainbow,
-            "topographical" => ColorModel::Topographical,
+    pub fn new<'a>(data: &'a MapData, colorargs: ColorArgs) -> Coloring<'a> {
+        let coloring = match colorargs.get_coloring() {
+            1 => ColorModel::BlueGreen,
+            2 => ColorModel::Rainbow,
+            3 => ColorModel::Topographical,
+            4 => ColorModel::Binary,
             _ => ColorModel::Binary,
         };
 
@@ -46,11 +49,15 @@ impl Coloring<'_> {
                           colormod : coloring,
                           image: None,
                           imagevec: None,
-                          waterlevel: 0.0, //TODO : make this variable
+                          waterlevel: colorargs.get_waterlevel(),
+                          darklevel: (colorargs.get_darklevel() * 255.0) as u8,
                         };
     }
 
     // -- Getters --
+    pub fn init_image(&mut self) {
+        self.image = Some(RgbaImage::new(self.data.width, self.data.height));
+    }
 
     pub fn get_image(&mut self) -> &RgbaImage {
         if self.image == None {
@@ -63,28 +70,24 @@ impl Coloring<'_> {
             }
         }
 
-        match &self.image {
-            Some(x) => return &x,
-            None => panic!("Shouldn't be possible"), //TODO : Should be an error here
-        }
+        //self.image is an Option set to Some immediately above and should never panic here
+        return self.image.as_ref().unwrap();
     }
 
     pub fn get_vec(&mut self) -> Vec<u8> {
         if self.imagevec == None {
             self.imagevec = Some(Vec::new());
-
+        
             match &self.colormod {
                 ColorModel::BlueGreen => self.data_to_blue_green_vec(self.waterlevel),
                 ColorModel::Rainbow => self.data_to_rainbow_vec(),
                 ColorModel::Topographical => self.data_to_topographical_vec(self.waterlevel),
-                _ => self.data_to_rainbow_vec(),
+                _ => self.data_to_blue_green_vec(self.waterlevel),
             }
         }
 
-        match &self.imagevec {
-            Some(x) => return x.to_vec(),
-            None => return Vec::new(),
-        }
+        //self.imagevec is an option set to Some immediately above and should (hopefully) never panic here
+        return self.imagevec.as_ref().unwrap().to_vec();
     }
 
     // -- Data Manipulation --
@@ -99,21 +102,20 @@ impl Coloring<'_> {
 
     // -- Data to Image Conversions --
 
-    pub fn data_to_binary(&mut self) {
+    fn data_to_binary(&mut self) {
         let map_vec = self.data;
-        let image = match &mut self.image {
-            None => panic!("Shouldn't be possible"), //TODO: improve this
-            Some(x) => x,
-        };
+
+        if self.image == None { self.init_image(); }
+        let image = self.image.as_mut().unwrap();
 
         let mut counterx = 0;
         let mut countery = 0;
 
         for x in &map_vec.data {
             if x <= &0.0 {
-                image.put_pixel(counterx, countery, Rgba([0, 0, 0, 255]));
+                image.put_pixel(counterx, countery, Rgba([0, 0, 0, self.darklevel]));
             } else {
-                image.put_pixel(counterx, countery, Rgba([255, 255, 255, 255]));
+                image.put_pixel(counterx, countery, Rgba([255, 255, 255, self.darklevel]));
             }
 
             counterx = (counterx + 1) % map_vec.width;
@@ -121,7 +123,19 @@ impl Coloring<'_> {
         }
     }
 
-    pub fn data_to_bluegreen_rgba(datapoint: &f64, water: &f64) -> [u8; 4] {
+    fn data_to_bluegreen_simple(&mut self, waterperc: f64) {
+        let map_vec = self.data;
+
+        if self.image == None { self.init_image(); }
+        let image = self.image.as_mut().unwrap();
+
+        let mut tempdata = map_vec.data.clone();
+        let initvalue = (tempdata.len() as f64) * waterperc;
+        let water = util::quickselect(&mut tempdata, initvalue as u32);
+
+    }
+
+    fn data_to_bluegreen_rgba(datapoint: &f64, water: &f64, dark: u8) -> [u8; 4] {
         let mut rgbvalue = (datapoint * 125.0) as u8;
         if rgbvalue > 125 {
             rgbvalue = 250;
@@ -130,9 +144,9 @@ impl Coloring<'_> {
         }
 
         if datapoint < water {
-            return [0, 0, rgbvalue, 255];
+            return [0, 0, rgbvalue, dark];
         } else {
-            return [0, rgbvalue, 0, 255];
+            return [0, rgbvalue, 0, dark];
         }
     }
 
@@ -155,12 +169,11 @@ impl Coloring<'_> {
     }
     */
 
-    pub fn data_to_blue_green(&mut self, waterperc: f64) {
+    fn data_to_blue_green(&mut self, waterperc: f64) {
         let map_vec = self.data;
-        let image = match &mut self.image {
-            None => panic!("Shouldn't be possible"),
-            Some(x) => x,
-        };
+
+        if self.image == None { self.init_image(); }
+        let image = self.image.as_mut().unwrap();
 
         //let mut counterx = 0;
         //let mut countery = 0;
@@ -177,10 +190,10 @@ impl Coloring<'_> {
             //*g = 100;
             //*b = 100;
             let new_point = map_vec.get_pixel(x,y);
-            *p = Rgba(Coloring::data_to_bluegreen_rgba(&new_point, &water));
+            *p = Rgba(Coloring::data_to_bluegreen_rgba(&new_point, &water, self.darklevel));
 
             //let new_point = map_vec.get_pixel(x, y);
-            //mage.put_pixel(x, y, Rgba(Coloring::data_to_bluegreen_rgba(&new_point, &water)));
+            //image.put_pixel(x, y, Rgba(Coloring::data_to_bluegreen_rgba(&new_point, &water)));
         }
 
         //for (x, y, p) in image.enumerate_pixels() {
@@ -196,29 +209,27 @@ impl Coloring<'_> {
         //}
     }
 
-    pub fn data_to_blue_green_vec(&mut self, waterperc: f64) {
+    fn data_to_blue_green_vec(&mut self, waterperc: f64) {
         let map_vec = self.data;
-        let imagevec = match &mut self.imagevec {
-            None => panic!("Shouldn't be possible"),
-            Some(x) => x,
-        };
+
+        if self.imagevec == None { self.imagevec = Some(Vec::new()) }
+        let imagevec = self.imagevec.as_mut().unwrap();
 
         let mut tempdata = map_vec.data.clone();
         let initvalue = (tempdata.len() as f64) * waterperc;
         let water = util::quickselect(&mut tempdata, initvalue as u32);
 
         for x in &map_vec.data {
-            let rgba_vec = Coloring::data_to_bluegreen_rgba(&x, &water);
+            let rgba_vec = Coloring::data_to_bluegreen_rgba(&x, &water, self.darklevel);
             imagevec.append(&mut rgba_vec.to_vec());
         }
     }
 
-    pub fn data_to_rainbow(&mut self) {
-        let map_vec = &self.data;
-        let image = match &mut self.image {
-            None => panic!("Shouldn't be possible"),
-            Some(x) => x,
-        };
+    fn data_to_rainbow(&mut self) {
+        let map_vec = self.data;
+
+        if self.image == None { self.init_image(); }
+        let image = self.image.as_mut().unwrap();
 
         fn normalize(value: &f64, low: f64) -> u8 {
             if value < &low {
@@ -261,12 +272,11 @@ impl Coloring<'_> {
         }
     }
 
-    pub fn data_to_rainbow_vec(&mut self) {
-        let map_vec = &self.data;
-        let imagevec = match &mut self.imagevec {
-            None => panic!("Shouldn't be possible"),
-            Some(x) => x,
-        };
+    fn data_to_rainbow_vec(&mut self) {
+        let map_vec = self.data;
+
+        if self.imagevec == None { self.imagevec = Some(Vec::new()) }
+        let imagevec = self.imagevec.as_mut().unwrap();
 
         fn normalize(value: &f64, low: f64) -> u8 {
             if value < &low {
@@ -303,12 +313,11 @@ impl Coloring<'_> {
         }
     }
 
-    pub fn data_to_topographical_vec(&mut self, water: f64) {
+    fn data_to_topographical_vec(&mut self, water: f64) {
         let map_vec = &self.data;
-        let imagevec = match &mut self.imagevec {
-            None => panic!("Shouldn't be possible"),
-            Some(x) => x,
-        };
+
+        if self.imagevec == None { self.imagevec = Some(Vec::new()) }
+        let imagevec = self.imagevec.as_mut().unwrap();
 
         let waterperc = water;
 

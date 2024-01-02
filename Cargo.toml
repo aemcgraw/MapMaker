@@ -37,3 +37,6 @@ js-sys = "0.3.22"
 
 [profile.release]
 debug = true
+
+[toolchain]
+channel = "nightly"
