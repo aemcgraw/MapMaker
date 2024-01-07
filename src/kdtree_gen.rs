@@ -1,12 +1,13 @@
 pub mod algorithms;
-pub mod map_data;
 pub mod config;
 pub mod utilities;
 pub mod coloring;
+pub mod wasm_structs;
+pub mod map_data;
 
+use crate::wasm_structs::ColorArgs;
 use coloring::coloring::Coloring;
 
-use map_data::MapData;
 use utilities::util::util;
 
 use utilities::file_util::file_util;
@@ -52,12 +53,13 @@ fn main() {
     let points = args.points;
     let output = args.path;
     let _coloring = args.coloring;
-    //let verbose = args.verbose;
 
     let kdt = util::generate_kdtree(points, width, height);
-    let mapdata = MapData::mapdata_from_points(kdt.collect_points(true), width, height);
+    //kdt.pretty_print();
+    //let mapdata = MapData::mapdata_from_points(kdt.collect_points(true), width, height);
+    let mapdata = kdt.to_mapdata(width, height);
 
-    let mut coloring = Coloring::new(&mapdata, "binary");
+    let mut coloring = Coloring::new(&mapdata, ColorArgs::new(2, 1.0, 0.0));
     let image = coloring.get_image();
 
     let reimage = imageops::resize(image, width, height, imageops::FilterType::Nearest);

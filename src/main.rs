@@ -3,6 +3,9 @@ pub mod map_data;
 pub mod config;
 pub mod utilities;
 pub mod coloring;
+pub mod wasm_structs;
+
+use wasm_structs::ColorArgs;
 
 use algorithms::ImageAlg;
 use algorithms::diamond_square::DiamondSquare;
@@ -25,10 +28,10 @@ struct Cli {
     algorithm: String,
 
     #[clap(short, long, 
-        default_value = "BlueGreen",
+        default_value = "1",
         help = "Process for coloring the resulting terrain:\n Options: \n\trainbow,\n\tbluegreen\n"
     )]
-    coloring: String,
+    coloring: u32,
 
     #[clap(short, long, 
         default_value = "map.png",
@@ -88,7 +91,7 @@ fn main() {
     let _maxima = mapdata.get_local_maxima();
     //println!("{:?}", maxima);
 
-    let mut coloring = Coloring::new(mapdata, &coloring);
+    let mut coloring = Coloring::new(mapdata, ColorArgs::new(coloring, 1.0, 0.7));
     //coloring.data_to_blue_green(0.9);
     let image = coloring.get_image();
 

@@ -3,7 +3,7 @@ use image::{RgbaImage, Rgba};
 use crate::map_data::MapData;
 use crate::utilities::util::util;
 
-use crate::ColorArgs;
+use crate::wasm_structs::ColorArgs;
 
 pub struct Coloring<'a> {
     pub data: &'a MapData,
@@ -21,11 +21,10 @@ pub enum ColorModel {
     Topographical,
 }
 
-// TODO : Does this need to be public?
-enum OutputFormat {
-    Image(RgbaImage),
-    ImageVec(Vec<u8>),
-}
+//enum OutputFormat {
+//    Image(RgbaImage),
+//    ImageVec(Vec<u8>),
+//}
 
 //impl OutputFormat {
 //    fn output(&self) {
@@ -66,8 +65,7 @@ impl Coloring<'_> {
                 ColorModel::Binary =>           self.data_to_binary(),
                 ColorModel::BlueGreen =>        self.data_to_blue_green(self.waterlevel),
                 ColorModel::Rainbow =>          self.data_to_rainbow(),
-                ColorModel::Topographical =>    self.data._to_topographical(self.waterlevel),
-                _ =>                            self.data_to_binary(),
+                ColorModel::Topographical =>    self.data_to_topographical(self.waterlevel),
             }
         }
 
@@ -97,6 +95,8 @@ impl Coloring<'_> {
         let water = util::quickselect(&mut tempdata, initvalue as u32);
         return water;
     }
+
+
 
     // -- Data Manipulation --
 

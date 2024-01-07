@@ -1,5 +1,3 @@
-
-
 #derive[(PartialEq)]
 pub struct modular {
     value: i32,
